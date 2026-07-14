@@ -1,4 +1,5 @@
 """FastMCP server for Antigravity IDE — skills, config, sessions, providers."""
+
 from __future__ import annotations
 
 import json
@@ -63,11 +64,13 @@ async def agy_list_skills(ctx: Any = None) -> dict:
     for entry in sorted(_SKILLS_DIR.iterdir()):
         if entry.is_dir() and (entry / "SKILL.md").is_file():
             meta = lock.get("skills", {}).get(entry.name, {})
-            skills.append({
-                "name": entry.name,
-                "source": meta.get("source", ""),
-                "source_type": meta.get("sourceType", "local"),
-            })
+            skills.append(
+                {
+                    "name": entry.name,
+                    "source": meta.get("source", ""),
+                    "source_type": meta.get("sourceType", "local"),
+                }
+            )
     return {"skills": skills, "count": len(skills)}
 
 
@@ -166,6 +169,7 @@ async def agy_delete_skill(skill_name: str, ctx: Any = None) -> dict:
     if not path.is_dir():
         return {"success": False, "error": f"Skill '{skill_name}' not found"}
     import shutil
+
     try:
         shutil.rmtree(path)
         lock = _read_lock()
@@ -280,14 +284,19 @@ async def agy_install_skill_from_github(repo: str, skill_path: str = "", ctx: An
     """
     import shutil
     import tempfile
+
     repo_name = repo.split("/")[-1].replace(".git", "")
     skill_name = skill_path.split("/")[-1] if skill_path else repo_name
     dest = _SKILLS_DIR / skill_name
 
     tmpdir = tempfile.mkdtemp()
     try:
-        subprocess.run(["git", "clone", f"https://github.com/{repo}.git", str(tmpdir / "repo")],
-                       capture_output=True, timeout=60, check=True)
+        subprocess.run(
+            ["git", "clone", f"https://github.com/{repo}.git", str(tmpdir / "repo")],
+            capture_output=True,
+            timeout=60,
+            check=True,
+        )
         src = Path(str(tmpdir / "repo" / skill_path)) if skill_path else Path(str(tmpdir / "repo"))
         src_skill = src / "SKILL.md" if src.is_dir() else src
         if src_skill.is_file():
@@ -322,7 +331,9 @@ async def agy_version(ctx: Any = None) -> dict:
     """
     for candidate in ["agy", "antigravity"]:
         try:
-            result = subprocess.run([candidate, "--version"], capture_output=True, text=True, timeout=5)
+            result = subprocess.run(
+                [candidate, "--version"], capture_output=True, text=True, timeout=5
+            )
             if result.returncode == 0:
                 return {"version": result.stdout.strip(), "path": candidate}
         except FileNotFoundError:
@@ -347,7 +358,10 @@ async def agy_help(ctx: Any = None) -> dict:
             {"name": "agy_set_config", "description": "Set a config value"},
             {"name": "agy_list_providers", "description": "List configured LLM providers"},
             {"name": "agy_skill_lock_status", "description": "Read skill lock metadata"},
-            {"name": "agy_install_skill_from_github", "description": "Install skill from GitHub repo"},
+            {
+                "name": "agy_install_skill_from_github",
+                "description": "Install skill from GitHub repo",
+            },
             {"name": "agy_version", "description": "Get AGY CLI version"},
         ],
         "skills_dir": str(_SKILLS_DIR),
