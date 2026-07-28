@@ -7,7 +7,7 @@ name = "agy-mcp"
 version = "0.1.0"
 description = "MCP server for Antigravity IDE — skill management, config bridge, agent orchestration"
 requires-python = ">=3.11"
-dependencies = ["fastmcp>=3.4.2,<4"]
+dependencies = ["fastmcp>=3.4.4,<4"]
 
 [project.scripts]
 agy-mcp = "agy_mcp.server:main"
@@ -22,4 +22,5 @@ target-version = "py311"
 [dependency-groups]
 dev = [
     "ruff>=0.15.21",
+    "pre-commit>=4.0.0",
 ]
