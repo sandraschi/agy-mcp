@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "agy-mcp"
 version = "0.1.0"
-description = "MCP server for Antigravity IDE â€” skill management, config bridge, agent orchestration"
+description = "MCP server for Antigravity IDE — skill management, config bridge, agent orchestration"
 requires-python = ">=3.11"
 dependencies = ["fastmcp>=3.4.4,<4"]
 
@@ -19,9 +19,12 @@ packages = ["src/agy_mcp"]
 line-length = 100
 target-version = "py311"
 
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "UP"]
+ignore = ["E501"]
 
-                param($m)
-                $inner = $m.Groups[2].Value.Trim()
-                $insert = if ($inner) { "$inner, `"$RuffPyprojectSpec`"" } else { "`"$RuffPyprojectSpec`"" }
-                $m.Groups[1].Value + $insert + $m.Groups[3].Value
-            
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.16.0,<0.17",
+]
