@@ -1,7 +1,8 @@
-"""FastMCP server for Antigravity IDE — skills, config, sessions, providers."""
+"""FastMCP server for Antigravity IDE - skills, config, sessions, providers."""
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import os
@@ -20,7 +21,7 @@ _CONFIG_FILE = _AGENTS_DIR / "config.json"
 
 mcp = FastMCP(
     "agy-mcp",
-    instructions="MCP server for Antigravity IDE — manage skills, config, providers, and agent sessions.",
+    instructions="MCP server for Antigravity IDE - manage skills, config, providers, and agent sessions.",
     version="0.1.0",
 )
 
@@ -291,7 +292,9 @@ async def agy_install_skill_from_github(repo: str, skill_path: str = "", ctx: An
 
     tmpdir = tempfile.mkdtemp()
     try:
-        subprocess.run(
+        # git clone blocks up to 60s — never on the event loop.
+        await asyncio.to_thread(
+            subprocess.run,
             ["git", "clone", f"https://github.com/{repo}.git", str(tmpdir / "repo")],
             capture_output=True,
             timeout=60,
@@ -331,8 +334,12 @@ async def agy_version(ctx: Any = None) -> dict:
     """
     for candidate in ["agy", "antigravity"]:
         try:
-            result = subprocess.run(
-                [candidate, "--version"], capture_output=True, text=True, timeout=5
+            result = await asyncio.to_thread(
+                subprocess.run,
+                [candidate, "--version"],
+                capture_output=True,
+                text=True,
+                timeout=5,
             )
             if result.returncode == 0:
                 return {"version": result.stdout.strip(), "path": candidate}
