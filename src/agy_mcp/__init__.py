@@ -1,1 +1,1 @@
-"""agy-mcp — Antigravity IDE bridge."""
+"""agy-mcp - Antigravity IDE bridge."""
